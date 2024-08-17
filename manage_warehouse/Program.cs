@@ -1,14 +1,7 @@
-<<<<<<< HEAD
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
-
-
-
-=======
->>>>>>> 24bb91f2728248f339818c3b51f3b9d905625c50
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,7 +10,6 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-<<<<<<< HEAD
 builder.Services.AddScoped<ManagePackage>(provider =>
     new ManagePackage(builder.Configuration.GetConnectionString("OrclConnStr")));
 
@@ -50,15 +42,6 @@ builder.Services
         };
     });
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-
-=======
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
->>>>>>> 24bb91f2728248f339818c3b51f3b9d905625c50
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -66,15 +49,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-<<<<<<< HEAD
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseCors("MyPolicy");
-=======
-
 app.UseAuthorization();
->>>>>>> 24bb91f2728248f339818c3b51f3b9d905625c50
-
 app.MapControllers();
 
 app.Run();
