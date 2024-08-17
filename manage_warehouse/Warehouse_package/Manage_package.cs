@@ -67,7 +67,7 @@ public class ManagePackage
                     command.Parameters.Add("p_role_id", OracleDbType.Int32).Value = model.role_id;
 
                     command.ExecuteNonQuery();
-                    
+
                     Console.WriteLine("Stored procedure executed successfully.");
                     return true;
                 }
@@ -219,7 +219,7 @@ public class ManagePackage
         return users;
     }
 
-    public bool UpdateUser(UserRegisterModel model,int id)
+    public bool UpdateUser(UserRegisterModel model, int id)
     {
         using (var connection = GetConnection())
         {
@@ -252,7 +252,7 @@ public class ManagePackage
     }
 
 
-public bool EntryProduct(ProductModel model)
+    public bool EntryProduct(ProductModel model)
     {
 
         DateTime entryDate;
@@ -264,7 +264,7 @@ public bool EntryProduct(ProductModel model)
         {
             Console.WriteLine($"Parsed date: {entryDate}");
         }
-       
+
 
         using (var connection = GetConnection())
         {
@@ -279,7 +279,7 @@ public bool EntryProduct(ProductModel model)
                     command.Parameters.Add("p_barcode", OracleDbType.Varchar2).Value = model.barcode;
                     command.Parameters.Add("p_product_name", OracleDbType.Varchar2).Value = model.product_name;
                     command.Parameters.Add("p_quantity", OracleDbType.Varchar2).Value = model.quantity;
-                    command.Parameters.Add("p_entry_date", OracleDbType.Varchar2).Value =formattedentryDate;
+                    command.Parameters.Add("p_entry_date", OracleDbType.Varchar2).Value = formattedentryDate;
                     command.Parameters.Add("p_operator_id", OracleDbType.Varchar2).Value = model.operator_id;
                     command.Parameters.Add("p_warehouse_name", OracleDbType.Varchar2).Value = model.warehouse_name;
 
@@ -639,7 +639,7 @@ public bool EntryProduct(ProductModel model)
                             name = reader["name"].ToString(),
                             lastname = reader["lastname"].ToString(),
                             warehouse_name = reader["warehouse_name"].ToString(),
-                            current_balance= Convert.ToInt32(reader["current_balance"])
+                            current_balance = Convert.ToInt32(reader["current_balance"])
                         };
                         products.Add(product);
                     }
@@ -744,4 +744,5 @@ public bool EntryProduct(ProductModel model)
                 }
             }
         }
+    }
 }
