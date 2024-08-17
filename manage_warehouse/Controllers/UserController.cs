@@ -47,6 +47,8 @@ namespace manage_warehouse.Controllers
         }
 
         [HttpPost("CreateUser")]
+        [Authorize(Roles = "admin")]
+
         public IActionResult CreateUser([FromBody] UserRegisterModel model)
         {
             try
@@ -97,7 +99,7 @@ namespace manage_warehouse.Controllers
                         new Claim(ClaimTypes.Role, user.role)
                     };
                     var token = GenerateNewJsonWebToken(authClaims);
-                    return Ok(new { message = "login was successfull",token });
+                    return Ok(new { message = "login was successfull",token,user.id,user.role });
                 }
                 else
                 {
@@ -111,7 +113,7 @@ namespace manage_warehouse.Controllers
         }
 
         [HttpGet("GetUsers/{id}")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
 
         public IActionResult GetUsers(int id)
         {
@@ -133,9 +135,9 @@ namespace manage_warehouse.Controllers
             }
         }
         [HttpPut("UpdateUser/{id}")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "admin")]
 
-        public IActionResult Update([FromBody] UserRegisterModel model, int id)
+        public IActionResult Update([FromBody] EditUserModel model, int id)
         {
             try
             {

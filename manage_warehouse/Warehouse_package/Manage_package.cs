@@ -64,10 +64,10 @@ public class ManagePackage
                     command.Parameters.Add("p_lastname", OracleDbType.Varchar2).Value = model.lastname;
                     command.Parameters.Add("p_username", OracleDbType.Varchar2).Value = model.username;
                     command.Parameters.Add("p_email", OracleDbType.Varchar2).Value = model.email;
-                    command.Parameters.Add("p_role_id", OracleDbType.Int32).Value = model.role_id;
+                    command.Parameters.Add("p_role_id", OracleDbType.Int32).Value =1;
 
                     command.ExecuteNonQuery();
-                    
+
                     Console.WriteLine("Stored procedure executed successfully.");
                     return true;
                 }
@@ -215,11 +215,9 @@ public class ManagePackage
                 }
             }
         }
-
         return users;
     }
-
-    public bool UpdateUser(UserRegisterModel model,int id)
+    public bool UpdateUser(EditUserModel model, int id)
     {
         using (var connection = GetConnection())
         {
@@ -232,10 +230,8 @@ public class ManagePackage
                 command.Parameters.Add("p_lastname", OracleDbType.Varchar2).Value = model.lastname;
                 command.Parameters.Add("p_username", OracleDbType.Varchar2).Value = model.username;
                 command.Parameters.Add("p_mobile", OracleDbType.Int32).Value = model.mobile;
-                command.Parameters.Add("p_password", OracleDbType.Varchar2).Value = model.password;
                 command.Parameters.Add("p_role", OracleDbType.Varchar2).Value = model.role_id;
-                command.Parameters.Add("p_warehouse_id", OracleDbType.Int32).Value = model.warehouse_id;
-                command.Parameters.Add("p_company_id", OracleDbType.Int32).Value = model.company_id;
+
                 try
                 {
                     command.ExecuteNonQuery();
@@ -252,7 +248,7 @@ public class ManagePackage
     }
 
 
-public bool EntryProduct(ProductModel model)
+    public bool EntryProduct(ProductModel model)
     {
 
         DateTime entryDate;
@@ -264,7 +260,7 @@ public bool EntryProduct(ProductModel model)
         {
             Console.WriteLine($"Parsed date: {entryDate}");
         }
-       
+
 
         using (var connection = GetConnection())
         {
@@ -279,7 +275,7 @@ public bool EntryProduct(ProductModel model)
                     command.Parameters.Add("p_barcode", OracleDbType.Varchar2).Value = model.barcode;
                     command.Parameters.Add("p_product_name", OracleDbType.Varchar2).Value = model.product_name;
                     command.Parameters.Add("p_quantity", OracleDbType.Varchar2).Value = model.quantity;
-                    command.Parameters.Add("p_entry_date", OracleDbType.Varchar2).Value =formattedentryDate;
+                    command.Parameters.Add("p_entry_date", OracleDbType.Varchar2).Value = formattedentryDate;
                     command.Parameters.Add("p_operator_id", OracleDbType.Varchar2).Value = model.operator_id;
                     command.Parameters.Add("p_warehouse_name", OracleDbType.Varchar2).Value = model.warehouse_name;
 
@@ -340,13 +336,11 @@ public bool EntryProduct(ProductModel model)
             }
             catch (OracleException ex)
             {
-                Console.WriteLine($"Oracle error: {ex.Message}");
-                return false;
+                throw;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"General error: {ex.Message}");
-                return false;
+                throw;
             }
         }
     }
@@ -381,7 +375,10 @@ public bool EntryProduct(ProductModel model)
                             barcode = reader["barcode"].ToString(),
                             product_name = reader["product_name"].ToString(),
                             quantity = Convert.ToInt32(reader["quantity"]),
-                            entry_date = reader["entry_date"].ToString()
+                            entry_date = reader["entry_date"].ToString(),
+                            name = reader["name"].ToString(),
+                            lastname = reader["lastname"].ToString(),
+                            warehouse_name = reader["warehouse_name"].ToString()
                         };
                         products.Add(product);
                     }
@@ -419,7 +416,10 @@ public bool EntryProduct(ProductModel model)
                             barcode = reader["barcode"].ToString(),
                             product_name = reader["product_name"].ToString(),
                             quantity = Convert.ToInt32(reader["quantity"]),
-                            exit_date = reader["exit_date"].ToString()
+                            exit_date = reader["exit_date"].ToString(),
+                            name = reader["name"].ToString(),
+                            lastname = reader["lastname"].ToString(),
+                            warehouse_name = reader["warehouse_name"].ToString()
                         };
                         products.Add(product);
                     }
@@ -453,6 +453,7 @@ public bool EntryProduct(ProductModel model)
                     {
                         var product = new ProductModel
                         {
+                            id = Convert.ToInt32(reader["id"]),
                             barcode = reader["barcode"].ToString(),
                             product_name = reader["product_name"].ToString(),
                             quantity = Convert.ToInt32(reader["quantity"]),
@@ -468,7 +469,6 @@ public bool EntryProduct(ProductModel model)
         }
         return products;
     }
-
 
 
     public List<ProductModel> GetExitProduct(int id)
@@ -496,10 +496,11 @@ public bool EntryProduct(ProductModel model)
                     {
                         var product = new ProductModel
                         {
+                            id = Convert.ToInt32(reader["id"]),
                             barcode = reader["barcode"].ToString(),
                             product_name = reader["product_name"].ToString(),
                             quantity = Convert.ToInt32(reader["quantity"]),
-                            exit_date = reader["entry_date"].ToString(),
+                            exit_date = reader["exit_date"].ToString(),
                             name = reader["name"].ToString(),
                             lastname = reader["lastname"].ToString(),
                             warehouse_name = reader["warehouse_name"].ToString()
@@ -552,7 +553,7 @@ public bool EntryProduct(ProductModel model)
                 command.Parameters.Add("p_barcode", OracleDbType.Varchar2).Value = model.barcode;
                 command.Parameters.Add("p_product_name", OracleDbType.Varchar2).Value = model.product_name;
                 command.Parameters.Add("p_quantity", OracleDbType.Int32).Value = model.quantity;
-                command.Parameters.Add("p_exit_date", OracleDbType.Varchar2).Value = model.entry_date;
+                command.Parameters.Add("p_exit_date", OracleDbType.Varchar2).Value = model.exit_date;
                 command.Parameters.Add("p_id", OracleDbType.Int32).Value = id;
                 command.Parameters.Add("p_unit", OracleDbType.Varchar2).Value = model.unit;
                 try
@@ -639,7 +640,7 @@ public bool EntryProduct(ProductModel model)
                             name = reader["name"].ToString(),
                             lastname = reader["lastname"].ToString(),
                             warehouse_name = reader["warehouse_name"].ToString(),
-                            current_balance= Convert.ToInt32(reader["current_balance"])
+                            current_balance = Convert.ToInt32(reader["current_balance"])
                         };
                         products.Add(product);
                     }
@@ -648,7 +649,6 @@ public bool EntryProduct(ProductModel model)
         }
         return products;
     }
-
 
 
     public bool AddWarehouse(WarehouseModel model)
@@ -719,7 +719,6 @@ public bool EntryProduct(ProductModel model)
         return warehouses;
     }
 
-
     public bool UpdateWarehouse(WarehouseModel model, int id)
     {
         using (var connection = GetConnection())
@@ -744,4 +743,41 @@ public bool EntryProduct(ProductModel model)
                 }
             }
         }
+    }
+    public CompanyWarehouseModel GetCompanyWarehouse(int id)
+    {
+        CompanyWarehouseModel product = null;
+
+        using (var connection = GetConnection())
+        {
+            connection.Open();
+            using (var command = new OracleCommand("pkg_warehouse_product_managment.proc_get_company_warehouse", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+
+                command.Parameters.Add(new OracleParameter("p_id", OracleDbType.Int32)).Value = id;
+                OracleParameter cursorParameter = new OracleParameter
+                {
+                    OracleDbType = OracleDbType.RefCursor,
+                    Direction = ParameterDirection.Output
+                };
+                command.Parameters.Add(cursorParameter);
+                using (var reader = command.ExecuteReader())
+                {
+                    if (reader.Read()) 
+                    {
+                        product = new CompanyWarehouseModel
+                        {
+                            company_id = Convert.ToInt32(reader["company_id"]),
+                            warehouse = reader["warehouse"].ToString(),
+                            warehouse_id = Convert.ToInt32(reader["warehouse_id"])
+                        };
+                    }
+                }
+            }
+        }
+
+        return product;
+    }
 }
+

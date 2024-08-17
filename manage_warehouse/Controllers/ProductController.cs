@@ -1,6 +1,8 @@
 ﻿using manage_warehouse.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Oracle.ManagedDataAccess.Client;
 
 namespace manage_warehouse.Controllers
 {
@@ -19,6 +21,8 @@ namespace manage_warehouse.Controllers
         }
 
         [HttpPost("EntryProduct")]
+        [Authorize(Roles = "operator")]
+
         public IActionResult EntryProduct([FromBody] ProductModel model)
         {
             try
@@ -41,6 +45,8 @@ namespace manage_warehouse.Controllers
 
 
         [HttpPost("ExitProduct")]
+        [Authorize(Roles = "operator")]
+
         public IActionResult ExitProduct([FromBody] ProductModel model)
         {
             try
@@ -55,6 +61,17 @@ namespace manage_warehouse.Controllers
                     return StatusCode(500, "Failed to exit product.");
                 }
             }
+            catch (OracleException ex)
+            {
+                if (ex.Number == 20001) 
+                {
+                    return StatusCode(20001, $"Oracle error occurred: {ex.Message}");
+                }
+                else
+                {
+                    return StatusCode(500, $"Oracle error occurred: {ex.Message}");
+                }
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error exiting product: {ex.Message}");
@@ -63,7 +80,7 @@ namespace manage_warehouse.Controllers
 
 
         [HttpGet("GetAllEntryProducts")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "manager")]
 
         public IActionResult GetEntryProducts()
         {
@@ -87,7 +104,7 @@ namespace manage_warehouse.Controllers
 
 
         [HttpGet("GetAllExitProducts")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "manager")]
 
         public IActionResult GetExitProducts()
         {
@@ -110,7 +127,7 @@ namespace manage_warehouse.Controllers
         }
 
         [HttpGet("GetEntryProduct/{id}")]
-        //[Authorize(Roles = "admin")]
+        //[Authorize(Roles = "operator")]
 
         public IActionResult GetEntryProduct(int id)
         {
@@ -133,7 +150,7 @@ namespace manage_warehouse.Controllers
         }
 
         [HttpGet("GetExitProduct/{id}")]
-        //[Authorize(Roles = "admin")]
+       // [Authorize(Roles = "operator")]
         public IActionResult GetExitProduct(int id)
         {
             try
@@ -156,7 +173,7 @@ namespace manage_warehouse.Controllers
 
 
         [HttpPut("UpdateEntryProduct/{id}")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "operator")]
 
         public IActionResult UpdateEntryProduct([FromBody] ProductModel model, int id)
         {
@@ -179,7 +196,7 @@ namespace manage_warehouse.Controllers
         }
 
         [HttpPut("UpdateExitProduct/{id}")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "operator")]
 
         public IActionResult UpdateExitProduct([FromBody] ProductModel model, int id)
         {
@@ -203,7 +220,7 @@ namespace manage_warehouse.Controllers
 
 
         [HttpGet("GetAllCurrentBalance")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "manager")]
         public IActionResult GetAllcurrentBalance()
         {
             try
@@ -225,7 +242,7 @@ namespace manage_warehouse.Controllers
         }
 
         [HttpGet("GetCurrentBalance/{id}")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "operator")]
         public IActionResult GetCurrentBalance(int id)
         {
             try
@@ -248,6 +265,8 @@ namespace manage_warehouse.Controllers
 
 
         [HttpPost("AddWarehouse")]
+        [Authorize(Roles = "manager")]
+
         public IActionResult AddWarehouse([FromBody] WarehouseModel model)
         {
             try
@@ -270,7 +289,7 @@ namespace manage_warehouse.Controllers
 
 
         [HttpPut("UpdateWarehouse/{id}")]
-        //[Authorize(Roles = "admin")]
+        [Authorize(Roles = "manager")]
 
         public IActionResult UpdateWarehouse([FromBody] WarehouseModel model, int id)
         {
@@ -294,12 +313,31 @@ namespace manage_warehouse.Controllers
 
 
         [HttpGet("GetWarehouses")]
-        //[Authorize(Roles = "admin")]
         public IActionResult GetWarehouses()
         {
             try
             {
                 var war = _managepack.GetWarehouses();
+                if (war != null)
+                {
+                    return Ok(war);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error getting warehoouses: {ex.Message}");
+            }
+        }
+        [HttpGet("GetWarehouseForUser/{id}")]
+        public IActionResult GetWarehouseForUser(int id)
+        {
+            try
+            {
+                var war = _managepack.GetCompanyWarehouse(id);
                 if (war != null)
                 {
                     return Ok(war);
