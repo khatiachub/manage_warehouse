@@ -312,12 +312,12 @@ namespace manage_warehouse.Controllers
         }
 
 
-        [HttpGet("GetWarehouses")]
-        public IActionResult GetWarehouses()
+        [HttpGet("GetWarehouses/{id}")]
+        public IActionResult GetWarehouses(int id)
         {
             try
             {
-                var war = _managepack.GetWarehouses();
+                var war = _managepack.GetWarehouses(id);
                 if (war != null)
                 {
                     return Ok(war);

@@ -206,7 +206,7 @@ public class ManagePackage
                             name = reader["name"].ToString(),
                             lastname = reader["lastname"].ToString(),
                             username = reader["username"].ToString(),
-                            mobile = Convert.ToInt32(reader["mobile"]),
+                            mobile = reader.IsDBNull(reader.GetOrdinal("mobile")) ? null : Convert.ToInt32(reader["mobile"]),
                             role = reader["role"].ToString(),
                             id = Convert.ToInt32(reader["id"])
                         };
@@ -217,7 +217,8 @@ public class ManagePackage
         }
         return users;
     }
-    public bool UpdateUser(EditUserModel model, int id)
+
+    public bool UpdateUser(EditUserModel model,int id)
     {
         using (var connection = GetConnection())
         {
@@ -683,7 +684,7 @@ public class ManagePackage
         }
     }
 
-    public List<WarehouseModel> GetWarehouses()
+    public List<WarehouseModel> GetWarehouses(int id)
     {
         List<WarehouseModel> warehouses = new List<WarehouseModel>();
 
@@ -699,7 +700,9 @@ public class ManagePackage
                     OracleDbType = OracleDbType.RefCursor,
                     Direction = ParameterDirection.Output
                 };
+                command.Parameters.Add("p_company_id", OracleDbType.Int32).Value = id;
                 command.Parameters.Add(cursorParameter);
+
 
                 using (var reader = command.ExecuteReader())
                 {
@@ -744,6 +747,7 @@ public class ManagePackage
             }
         }
     }
+
     public CompanyWarehouseModel GetCompanyWarehouse(int id)
     {
         CompanyWarehouseModel product = null;
@@ -764,13 +768,13 @@ public class ManagePackage
                 command.Parameters.Add(cursorParameter);
                 using (var reader = command.ExecuteReader())
                 {
-                    if (reader.Read()) 
+                    if (reader.Read())
                     {
                         product = new CompanyWarehouseModel
                         {
                             company_id = Convert.ToInt32(reader["company_id"]),
-                            warehouse = reader["warehouse"].ToString(),
-                            warehouse_id = Convert.ToInt32(reader["warehouse_id"])
+                            warehouse = reader.IsDBNull(reader.GetOrdinal("warehouse")) ? null : reader.GetString(reader.GetOrdinal("warehouse")),
+                            warehouse_id = reader.IsDBNull(reader.GetOrdinal("warehouse_id")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("warehouse_id"))
                         };
                     }
                 }
