@@ -217,7 +217,8 @@ public class ManagePackage
         }
         return users;
     }
-    public bool UpdateUser(EditUserModel model, int id)
+
+    public bool UpdateUser(EditUserModel model,int id)
     {
         using (var connection = GetConnection())
         {
@@ -744,6 +745,7 @@ public class ManagePackage
             }
         }
     }
+
     public CompanyWarehouseModel GetCompanyWarehouse(int id)
     {
         CompanyWarehouseModel product = null;
@@ -764,7 +766,7 @@ public class ManagePackage
                 command.Parameters.Add(cursorParameter);
                 using (var reader = command.ExecuteReader())
                 {
-                    if (reader.Read()) 
+                    if (reader.Read())
                     {
                         product = new CompanyWarehouseModel
                         {
