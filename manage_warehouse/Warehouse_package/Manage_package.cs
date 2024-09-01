@@ -349,7 +349,7 @@ public class ManagePackage
 
 
 
-    public List<ProductModel> GetAllEntryProducts()
+    public List<ProductModel> GetAllEntryProducts(int id)
     {
         List<ProductModel> products = new List<ProductModel>();
 
@@ -365,6 +365,7 @@ public class ManagePackage
                     OracleDbType = OracleDbType.RefCursor,
                     Direction = ParameterDirection.Output
                 };
+                command.Parameters.Add("p_company_id", OracleDbType.Int32).Value = id;
                 command.Parameters.Add(cursorParameter);
 
                 using (var reader = command.ExecuteReader())
@@ -390,7 +391,7 @@ public class ManagePackage
     }
 
 
-    public List<ProductModel> GetAllExitProducts()
+    public List<ProductModel> GetAllExitProducts(int id)
     {
         List<ProductModel> products = new List<ProductModel>();
 
@@ -406,6 +407,7 @@ public class ManagePackage
                     OracleDbType = OracleDbType.RefCursor,
                     Direction = ParameterDirection.Output
                 };
+                command.Parameters.Add("p_company_id", OracleDbType.Int32).Value = id;
                 command.Parameters.Add(cursorParameter);
 
                 using (var reader = command.ExecuteReader())
@@ -573,7 +575,7 @@ public class ManagePackage
     }
 
 
-    public List<ProductModel> GetAllCurrentBalance()
+    public List<ProductModel> GetAllCurrentBalance(int id)
     {
         List<ProductModel> products = new List<ProductModel>();
 
@@ -589,6 +591,7 @@ public class ManagePackage
                     OracleDbType = OracleDbType.RefCursor,
                     Direction = ParameterDirection.Output
                 };
+                command.Parameters.Add("p_company_id", OracleDbType.Int32).Value = id;
                 command.Parameters.Add(cursorParameter);
 
                 using (var reader = command.ExecuteReader())

@@ -79,14 +79,14 @@ namespace manage_warehouse.Controllers
         }
 
 
-        [HttpGet("GetAllEntryProducts")]
+        [HttpGet("GetAllEntryProducts/{id}")]
         [Authorize(Roles = "manager")]
 
-        public IActionResult GetEntryProducts()
+        public IActionResult GetEntryProducts(int id)
         {
             try
             {
-                var prod = _managepack.GetAllEntryProducts();
+                var prod = _managepack.GetAllEntryProducts(id);
                 if (prod != null)
                 {
                     return Ok(prod);
@@ -103,14 +103,14 @@ namespace manage_warehouse.Controllers
         }
 
 
-        [HttpGet("GetAllExitProducts")]
+        [HttpGet("GetAllExitProducts/{id}")]
         [Authorize(Roles = "manager")]
 
-        public IActionResult GetExitProducts()
+        public IActionResult GetExitProducts(int id)
         {
             try
             {
-                var prod = _managepack.GetAllExitProducts();
+                var prod = _managepack.GetAllExitProducts(id);
                 if (prod != null)
                 {
                     return Ok(prod);
@@ -219,13 +219,13 @@ namespace manage_warehouse.Controllers
         }
 
 
-        [HttpGet("GetAllCurrentBalance")]
+        [HttpGet("GetAllCurrentBalance/{id}")]
         [Authorize(Roles = "manager")]
-        public IActionResult GetAllcurrentBalance()
+        public IActionResult GetAllcurrentBalance(int id)
         {
             try
             {
-                var balance = _managepack.GetAllCurrentBalance();
+                var balance = _managepack.GetAllCurrentBalance(id);
                 if (balance != null)
                 {
                     return Ok(balance);
