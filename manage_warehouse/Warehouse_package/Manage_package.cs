@@ -288,13 +288,11 @@ public class ManagePackage
             }
             catch (OracleException ex)
             {
-                Console.WriteLine($"Oracle error: {ex.Message}");
-                return false;
+                throw;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"General error: {ex.Message}");
-                return false;
+                throw;
             }
         }
     }

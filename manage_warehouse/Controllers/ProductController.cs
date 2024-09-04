@@ -37,6 +37,17 @@ namespace manage_warehouse.Controllers
                     return StatusCode(500, "Failed to add product.");
                 }
             }
+            catch (OracleException ex)
+            {
+                if (ex.Number == 20001)
+                {
+                    return StatusCode(20001, $"Oracle error occurred: {ex.Message}");
+                }
+                else
+                {
+                    return StatusCode(500, $"Oracle error occurred: {ex.Message}");
+                }
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error creating user: {ex.Message}");
