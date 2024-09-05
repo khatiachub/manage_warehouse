@@ -138,7 +138,7 @@ namespace manage_warehouse.Controllers
         }
 
         [HttpGet("GetEntryProduct/{id}")]
-        //[Authorize(Roles = "operator")]
+        [Authorize(Roles = "operator")]
 
         public IActionResult GetEntryProduct(int id)
         {
@@ -161,7 +161,7 @@ namespace manage_warehouse.Controllers
         }
 
         [HttpGet("GetExitProduct/{id}")]
-       // [Authorize(Roles = "operator")]
+        [Authorize(Roles = "operator")]
         public IActionResult GetExitProduct(int id)
         {
             try
