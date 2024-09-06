@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Oracle.ManagedDataAccess.Client;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -12,16 +13,13 @@ namespace manage_warehouse.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController :MainController
     {
         private readonly ManagePackage _managepack;
-        private readonly IConfiguration _configuration;
 
-
-        public UserController(ManagePackage managepackage, IConfiguration configuration)
+        public UserController(ManagePackage managepackage, IConfiguration configuration):base(configuration) 
         {
             _managepack = managepackage;
-            _configuration = configuration;
         }
 
 
@@ -38,6 +36,17 @@ namespace manage_warehouse.Controllers
                 else
                 {
                     return StatusCode(500, "Failed to create company.");
+                }
+            }
+            catch (OracleException ex)
+            {
+                if (ex.Number == 20001)
+                {
+                    return StatusCode(20001, $"Oracle error occurred: {ex.Message}");
+                }
+                else
+                {
+                    return StatusCode(500, $"Oracle error occurred: {ex.Message}");
                 }
             }
             catch (Exception ex)
@@ -63,24 +72,21 @@ namespace manage_warehouse.Controllers
                     return StatusCode(500, "Failed to create company.");
                 }
             }
+            catch (OracleException ex)
+            {
+                if (ex.Number == 20001)
+                {
+                    return StatusCode(20001, $"Oracle error occurred: {ex.Message}");
+                }
+                else
+                {
+                    return StatusCode(500, $"Oracle error occurred: {ex.Message}");
+                }
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error creating user: {ex.Message}");
             }
-        }
-
-        private string GenerateNewJsonWebToken(List<Claim> claims)
-        {
-            var authSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
-            var tokenObject = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.MaxValue,
-                claims: claims,
-                signingCredentials: new SigningCredentials(authSecret, SecurityAlgorithms.HmacSha256)
-            );
-            string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
-            return token;
         }
 
         [HttpPost("LoginUser")]

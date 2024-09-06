@@ -9,9 +9,10 @@ using System.Text.Json;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.Text;
-using System.Security.Cryptography;
+using manage_warehouse.Warehouse_package;
 
-public class ManagePackage
+
+public class ManagePackage:base_package
 {
     private readonly string _connectionString;
 
@@ -23,25 +24,6 @@ public class ManagePackage
     protected OracleConnection GetConnection()
     {
         return new OracleConnection(_connectionString);
-    }
-
-    private string HashPassword(string password)
-    {
-        using (var sha256 = SHA256.Create())
-        {
-            byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            StringBuilder builder = new StringBuilder();
-            foreach (byte b in bytes)
-            {
-                builder.Append(b.ToString("x2"));
-            }
-            return builder.ToString();
-        }
-    }
-    private bool ValidatePassword(string inputPassword, string dbPasswordHash)
-    {
-        string hashedInputPassword = HashPassword(inputPassword);
-        return hashedInputPassword == dbPasswordHash;
     }
 
 
@@ -74,13 +56,11 @@ public class ManagePackage
             }
             catch (OracleException ex)
             {
-                Console.WriteLine($"Oracle error: {ex.Message}");
-                return false;
+                throw;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"General error: {ex.Message}");
-                return false;
+                throw;
             }
         }
     }
@@ -113,13 +93,11 @@ public class ManagePackage
             }
             catch (OracleException ex)
             {
-                Console.WriteLine($"Oracle error: {ex.Message}");
-                return false;
+                throw;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"General error: {ex.Message}");
-                return false;
+                throw;
             }
         }
     }
@@ -146,16 +124,9 @@ public class ManagePackage
                         {
                             var hashedpassword = reader["password"].ToString();
 
-                            var Tokenmodel = new TokenModel
-                            {
-                                id = Convert.ToInt32(reader["id"]),
-                                username = reader["username"].ToString(),
-                                role = reader["role"].ToString()
-                            };
-
                             if (ValidatePassword(model.password, hashedpassword))
                             {
-                                return Tokenmodel;
+                                return RetrieveUserInfo(connection, model.username);
                             }
                             else
                             {
@@ -176,7 +147,32 @@ public class ManagePackage
             throw;
         }
     }
+    private TokenModel RetrieveUserInfo(OracleConnection connection, string username)
+    {
+        using (var command = new OracleCommand("pkg_users_operations.proc_get_user_info", connection))
+        {
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.Add("p_username", OracleDbType.Varchar2).Value = username;
+            command.Parameters.Add("p_user_curs", OracleDbType.RefCursor).Direction = ParameterDirection.Output;
 
+            using (var reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    return new TokenModel
+                    {
+                        username = reader["username"].ToString(),
+                        id = Convert.ToInt32(reader["id"]),
+                        role = reader["role"].ToString()
+                    };
+                }
+                else
+                {
+                    return null; 
+                }
+            }
+        }
+    }
 
     public List<UserModel> GetUsers(int id)
     {
